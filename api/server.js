@@ -1,20 +1,24 @@
 const express = require('express')
 const User = require('./users/model')
 
-const app = express()
+const server = express()
 
-app.use(express.json())
+server.use(express.json())
 
-app.post('/api/users', (req, res) => {
-	//validate req.body 
+// Add new user
+server.post('/api/users', (req, res) => {
+	//validate req.body for req'd fields
 	if (!req.body.name || !req.body.bio) {
-		res.status(422).json({ message: 'name and bio are required' })
+		// send error if invalid
+		res.status(400).json({ message: 'Please provide name and bio for the user' })
 	} else {
 		const { name, bio } = req.body
-		User.create({ name, bio })
+		// valid request = save new user  and return user obj
+		User.insert({ name, bio })
 			.then(user => {
 				res.status(201).json(user)
 			})
+			//catch server error		
 			.catch(err => {
 				res.status(500).json({
 					message: err.message
@@ -23,4 +27,18 @@ app.post('/api/users', (req, res) => {
 	}
 })
 
-module.exports = app // EXPORT YOUR SERVER instead of {}
+// Get list of users
+server.get('/api/users', (req, res) => {
+	User.find()
+		.then(users => {
+			res.status(200).json(users)
+		})
+		.catch(err => {
+			console.log(err)
+			res.status(500).json({
+				message: "The users information could not be retrieved",
+			})
+		})
+})
+
+module.exports = server // EXPORT YOUR SERVER instead of {}
