@@ -83,12 +83,12 @@ server.put('/api/users/:id', (req, res) => {
 	const { id } = req.params
 	const { name, bio } = req.body
 	if (!name || !bio) {
-		res.status(422).json({ message: "Please provide name and bio for the user" })
+		res.status(400).json({ message: "Please provide name and bio for the user" })
 	} else {
 		User.update(id, { name, bio })
 			.then(updated => {
 				if (!updated) {
-					res.status(400).json({ message: "The user with the specified ID does not exist" })
+					res.status(404).json({ message: "The user with the specified ID does not exist" })
 				} else {
 					res.status(200).json(updated)
 				}
